@@ -57,7 +57,8 @@ def get_telegram_client():
 
 def store_message(user_id, chat_id, role, content, msg_id=None):
     conn = get_db()
-    cur = conn.cursor()
+    telegram_enabled = bool(API_ID and API_HASH)
+    return render_template("login.html", telegram_enabled=telegram_enabled)
     try:
         cur.execute(
             "INSERT INTO messages(user_id, chat_id, role, content, msg_id) VALUES(?,?,?,?,?)",

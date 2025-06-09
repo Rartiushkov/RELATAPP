@@ -12,6 +12,8 @@
         <button type="submit">Login</button>
     </form>
     <p>No account? <a href="{{ url_for('register') }}">Register</a></p>
+    {% if telegram_enabled %}
+    {% endif %}
 
     <p><a href="{{ url_for('telegram_login') }}">Login with Telegram</a></p>
 

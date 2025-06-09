@@ -1,5 +1,9 @@
 
-# ChatGPT Web App
+2. Create a `.env` file with the following contents. The Telegram values are
+   required if you want to log in via Telegram:
+
+If you omit `TG_API_ID` or `TG_API_HASH`, the "Login with Telegram" option will
+not be shown.
 
 This project is a minimal example of a web application that allows users to chat with Telegram contacts or with a local account. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
 
