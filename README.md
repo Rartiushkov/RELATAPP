@@ -1,3 +1,4 @@
+
 # ChatGPT Web App
 
 This project is a minimal example of a web application that allows users to register and login with a username and password. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
@@ -5,6 +6,7 @@ This project is a minimal example of a web application that allows users to regi
 ## Features
 
 - Register and login with a username and password
+
 - Messages stored locally in `chat.db`
 - ChatGPT integration for advice or auto responses
 - Chat analytics page showing message counts
@@ -12,11 +14,19 @@ This project is a minimal example of a web application that allows users to regi
 
 ## Setup
 
+
 1. Get an OpenAI API key.
 2. Create a `.env` file with the following contents:
 
 ```
 FLASK_SECRET=change_me
+=======
+1. Create a Telegram bot and obtain its **bot token** and **username**.
+2. Get an OpenAI API key.
+3. Create a `.env` file with the following contents:
+
+```
+
 OPENAI_API_KEY=<your OpenAI key>
 ```
 

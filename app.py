@@ -1,13 +1,17 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
+
 import os
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
 
 DATABASE = "chat.db"
+
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 
@@ -21,6 +25,7 @@ def get_db():
 def index():
     if "user" in session:
         return redirect(url_for("chat"))
+
     return render_template("login.html")
 
 
@@ -61,6 +66,7 @@ def register():
             return "User already exists", 400
         return redirect(url_for("index"))
     return render_template("register.html")
+
 
 
 @app.route("/chat")
