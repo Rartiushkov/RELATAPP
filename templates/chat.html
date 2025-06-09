@@ -21,6 +21,11 @@
         <button type="submit">Send</button>
         <button type="button" id="auto-btn">Auto reply</button>
     </form>
+
+    {% if chat_id is defined %}
+    <script>const CHAT_ID={{ chat_id }};const TELEGRAM=true;</script>
+    {% endif %}
+
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>
