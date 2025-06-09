@@ -7,6 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from telethon.sync import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 
+from dotenv import load_dotenv
+import asyncio
+
+load_dotenv()
+
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
 
@@ -16,6 +22,9 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 API_ID = os.environ.get("TG_API_ID")
 API_HASH = os.environ.get("TG_API_HASH")
 telegram_client = None
+
+telegram_loop = None
+
 
 
 def init_db():
@@ -49,9 +58,17 @@ def get_db():
 
 
 def get_telegram_client():
-    global telegram_client
+    global telegram_client, telegram_loop
     if telegram_client is None and API_ID and API_HASH:
-        telegram_client = TelegramClient("web_session", int(API_ID), API_HASH)
+        if telegram_loop is None:
+            telegram_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(telegram_loop)
+        telegram_client = TelegramClient(
+            "web_session", int(API_ID), API_HASH, loop=telegram_loop
+        )
+    elif telegram_loop:
+        asyncio.set_event_loop(telegram_loop)
+
     return telegram_client
 
 
@@ -121,7 +138,6 @@ def telegram_code():
     session["user"] = {"id": me.id, "username": me.username or me.first_name}
     session["telegram"] = True
     return redirect(url_for("dialogs"))
-
 
 
 @app.route("/login", methods=["POST"])

@@ -1,4 +1,5 @@
 
+
 # ChatGPT Web App
 
 This project is a minimal example of a web application that allows users to chat with Telegram contacts or with a local account. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
@@ -6,12 +7,7 @@ This project is a minimal example of a web application that allows users to chat
 
 ## Features
 
-
-
-## Features
-
 - Register and login with a username and password
-
 
 - Optional login with your Telegram account using SMS code
 - Browse your Telegram dialogs (chats only, no groups)
@@ -29,11 +25,13 @@ This project is a minimal example of a web application that allows users to chat
 
 ```
 FLASK_SECRET=change_me
-
 OPENAI_API_KEY=<your OpenAI key>
 TG_API_ID=<your api_id>
 TG_API_HASH=<your api_hash>
 ```
+
+The application uses `python-dotenv` to load these variables automatically when
+it starts.
 
 
 If you omit `TG_API_ID` or `TG_API_HASH`, the "Login with Telegram" option will
@@ -45,7 +43,6 @@ not be shown.
 ```bash
 pip install -r requirements.txt
 ```
-
 
 4. Run the development server:
 
