@@ -1,24 +1,30 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
+
 import os
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from telethon.sync import TelegramClient
 from telethon.errors import SessionPasswordNeededError
+
 from dotenv import load_dotenv
 import asyncio
 
 load_dotenv()
 
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
 
 DATABASE = "chat.db"
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 API_ID = os.environ.get("TG_API_ID")
 API_HASH = os.environ.get("TG_API_HASH")
 telegram_client = None
+
 telegram_loop = None
+
 
 
 def init_db():
@@ -43,10 +49,12 @@ def init_db():
     conn.close()
 
 
+
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 def get_telegram_client():
@@ -60,6 +68,7 @@ def get_telegram_client():
         )
     elif telegram_loop:
         asyncio.set_event_loop(telegram_loop)
+
     return telegram_client
 
 
@@ -94,8 +103,10 @@ def index():
         if session.get("telegram"):
             return redirect(url_for("dialogs"))
         return redirect(url_for("chat"))
+
     telegram_enabled = bool(API_ID and API_HASH)
     return render_template("login.html", telegram_enabled=telegram_enabled)
+
 
 
 @app.route("/telegram_login", methods=["GET", "POST"])
@@ -135,6 +146,7 @@ def login():
     password = request.form["password"]
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("SELECT id, password FROM users WHERE username=?", (username,))
     row = cur.fetchone()
     if row and check_password_hash(row["password"], password):
@@ -150,6 +162,7 @@ def register():
         password = request.form["password"]
         conn = get_db()
         cur = conn.cursor()
+
         try:
             cur.execute(
                 "INSERT INTO users(username, password) VALUES(?, ?)",
@@ -162,6 +175,7 @@ def register():
     return render_template("register.html")
 
 
+
 @app.route("/chat")
 def chat():
     if "user" not in session:
@@ -169,6 +183,7 @@ def chat():
     conn = get_db()
     cur = conn.cursor()
     cur.execute(
+
         "SELECT role, content FROM messages WHERE user_id=? ORDER BY id",
         (session["user"]["id"],),
     )
@@ -177,7 +192,9 @@ def chat():
 
 
 @app.route("/send", methods=["POST"])
+
 def send_local():
+
     if "user" not in session:
         return "Unauthorized", 401
     message = request.form["message"]
@@ -216,6 +233,7 @@ def send_local():
     )
     conn.commit()
     return jsonify({"reply": reply})
+
 
 
 @app.route("/send/<int:chat_id>", methods=["POST"])
@@ -258,6 +276,7 @@ def dialog(chat_id):
 
 @app.route("/auto_reply", methods=["POST"])
 def auto_reply_local():
+
     if "user" not in session:
         return "Unauthorized", 401
     conn = get_db()
@@ -287,6 +306,7 @@ def auto_reply_local():
     )
     conn.commit()
     return jsonify({"reply": reply})
+
 
 
 @app.route("/auto_reply/<int:chat_id>", methods=["POST"])
@@ -344,13 +364,17 @@ def analytics():
 @app.route("/logout")
 def logout():
     session.pop("user", None)
+
     session.pop("tg_phone", None)
     client = get_telegram_client()
     if client and client.is_user_authorized():
         client.log_out()
+
     return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
+
     init_db()
+
     app.run(debug=True)
