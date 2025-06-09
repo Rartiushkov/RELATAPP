@@ -1,7 +1,10 @@
 
-# ChatGPT Web App
+- Optional login with your Telegram account
+TG_API_ID=<your api_id>
+TG_API_HASH=<your api_hash>
+3. Install dependencies:
 
-This project is a minimal example of a web application that allows users to register and login with a username and password. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
+4. Run the development server:
 
 ## Features
 

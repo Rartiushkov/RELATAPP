@@ -1,15 +1,61 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
+from telethon.sync import TelegramClient
+from telethon.errors import SessionPasswordNeededError
 
-import os
-import requests
-from werkzeug.security import generate_password_hash, check_password_hash
+API_ID = os.environ.get("TG_API_ID")
+API_HASH = os.environ.get("TG_API_HASH")
+telegram_client = None
 
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
+def init_db():
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)"
+    )
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY, user_id TEXT, role TEXT, content TEXT)"
+    )
+    conn.commit()
+    conn.close()
+def get_telegram_client():
+    global telegram_client
+    if telegram_client is None and API_ID and API_HASH:
+        telegram_client = TelegramClient("web_session", int(API_ID), API_HASH)
+    return telegram_client
 
-DATABASE = "chat.db"
+
+@app.route("/telegram_login", methods=["GET", "POST"])
+def telegram_login():
+    client = get_telegram_client()
+    if client is None:
+        return "Telegram login not configured", 500
+    if request.method == "POST":
+        phone = request.form["phone"]
+        client.connect()
+        if not client.is_user_authorized():
+            client.send_code_request(phone)
+            session["tg_phone"] = phone
+            return render_template("telegram_code.html")
+    return render_template("telegram_login.html")
+
+
+@app.route("/telegram_code", methods=["POST"])
+def telegram_code():
+    client = get_telegram_client()
+    if client is None:
+        return "Telegram login not configured", 500
+    phone = session.get("tg_phone")
+    code = request.form["code"]
+    client.connect()
+    if not client.is_user_authorized():
+        client.sign_in(phone, code)
+    me = client.get_me()
+    session["user"] = {"id": me.id, "username": me.username or me.first_name}
+    return redirect(url_for("chat"))
+
+
 
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -148,6 +194,11 @@ def auto_reply():
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
             json={"model": "gpt-3.5-turbo", "messages": chat_history},
+    session.pop("tg_phone", None)
+    client = get_telegram_client()
+    if client and client.is_user_authorized():
+        client.log_out()
+    init_db()
             timeout=15,
         )
         data = resp.json()
