@@ -2,6 +2,10 @@ const form = document.getElementById('chat-form');
 const box = document.getElementById('chat-box');
 const autoBtn = document.getElementById('auto-btn');
 
+const tokenInput = document.querySelector('input[name="csrf_token"]');
+const csrfToken = tokenInput ? tokenInput.value : '';
+
+
 const sendUrl = typeof TELEGRAM !== 'undefined' ? `/send/${CHAT_ID}` : '/send';
 const autoUrl = typeof TELEGRAM !== 'undefined' ? `/auto_reply/${CHAT_ID}` : '/auto_reply';
 
@@ -12,7 +16,8 @@ form.addEventListener('submit', async e => {
 
     method: 'POST',
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: new URLSearchParams({message})
+    body: new URLSearchParams({message, csrf_token: csrfToken})
+
   });
   const data = await resp.json();
   const userDiv = document.createElement('div');
@@ -33,7 +38,11 @@ form.addEventListener('submit', async e => {
 if (autoBtn) {
   autoBtn.addEventListener('click', async () => {
 
-    const resp = await fetch(autoUrl, { method: 'POST' });
+    const resp = await fetch(autoUrl, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({csrf_token: csrfToken})
+    });
 
     const data = await resp.json();
     const botDiv = document.createElement('div');

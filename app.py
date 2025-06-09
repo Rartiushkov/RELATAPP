@@ -8,13 +8,15 @@ from telethon.sync import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
+
 import asyncio
 
 load_dotenv()
 
-
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
+csrf = CSRFProtect(app)
 
 DATABASE = "chat.db"
 
@@ -24,8 +26,6 @@ API_HASH = os.environ.get("TG_API_HASH")
 telegram_client = None
 
 telegram_loop = None
-
-
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
@@ -115,7 +115,11 @@ def telegram_login():
     if client is None:
         return "Telegram login not configured", 500
     if request.method == "POST":
-        phone = request.form["phone"]
+
+        phone = request.form.get("phone")
+        if not phone:
+            return render_template("telegram_login.html", error="Phone required")
+
         client.connect()
         if not client.is_user_authorized():
             client.send_code_request(phone)
@@ -222,8 +226,13 @@ def send_local():
             json={"model": "gpt-3.5-turbo", "messages": chat_history},
             timeout=15,
         )
-        data = resp.json()
-        reply = data["choices"][0]["message"]["content"]
+
+        if resp.ok:
+            data = resp.json()
+            reply = data["choices"][0]["message"]["content"]
+        else:
+            reply = f"OpenAI API error: {resp.status_code}"
+
     else:
         reply = "No OpenAI API key configured."
 
@@ -296,8 +305,13 @@ def auto_reply_local():
             json={"model": "gpt-3.5-turbo", "messages": chat_history},
             timeout=15,
         )
-        data = resp.json()
-        reply = data["choices"][0]["message"]["content"]
+
+        if resp.ok:
+            data = resp.json()
+            reply = data["choices"][0]["message"]["content"]
+        else:
+            reply = f"OpenAI API error: {resp.status_code}"
+
     else:
         reply = "No OpenAI API key configured."
     cur.execute(
@@ -336,8 +350,13 @@ def auto_reply_telegram(chat_id):
             json={"model": "gpt-3.5-turbo", "messages": chat_history},
             timeout=15,
         )
-        data = resp.json()
-        reply = data["choices"][0]["message"]["content"]
+
+        if resp.ok:
+            data = resp.json()
+            reply = data["choices"][0]["message"]["content"]
+        else:
+            reply = f"OpenAI API error: {resp.status_code}"
+
     else:
         reply = "No OpenAI API key configured."
     client = get_telegram_client()

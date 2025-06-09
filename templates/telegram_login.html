@@ -6,7 +6,11 @@
 </head>
 <body>
     <h1>Login with Telegram</h1>
+
+    {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
     <form method="post">
+        {{ csrf_token() }}
+
         <input type="text" name="phone" placeholder="Phone number" required>
         <button type="submit">Send code</button>
     </form>

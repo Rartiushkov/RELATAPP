@@ -1,5 +1,4 @@
 
-
 # ChatGPT Web App
 
 This project is a minimal example of a web application that allows users to chat with Telegram contacts or with a local account. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
@@ -43,6 +42,7 @@ not be shown.
 ```bash
 pip install -r requirements.txt
 ```
+Flask-WTF is included for CSRF protection, so be sure it is installed.
 
 4. Run the development server:
 

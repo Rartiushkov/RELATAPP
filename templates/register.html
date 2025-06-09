@@ -7,6 +7,9 @@
 <body>
     <h1>Register</h1>
     <form method="post" action="{{ url_for('register') }}">
+
+        {{ csrf_token() }}
+
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Create account</button>
