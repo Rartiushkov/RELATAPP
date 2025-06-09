@@ -1,6 +1,9 @@
 
 # ChatGPT Web App
 
+The application uses `python-dotenv` to load these variables automatically when
+it starts.
+
 This project is a minimal example of a web application that allows users to chat with Telegram contacts or with a local account. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
 
 

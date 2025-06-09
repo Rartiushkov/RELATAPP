@@ -1,8 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
+from dotenv import load_dotenv
+import asyncio
 
-import os
-import requests
+load_dotenv()
+
+telegram_loop = None
+    global telegram_client, telegram_loop
+        if telegram_loop is None:
+            telegram_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(telegram_loop)
+        telegram_client = TelegramClient(
+            "web_session", int(API_ID), API_HASH, loop=telegram_loop
+        )
+    elif telegram_loop:
+        asyncio.set_event_loop(telegram_loop)
 from werkzeug.security import generate_password_hash, check_password_hash
 from telethon.sync import TelegramClient
 from telethon.errors import SessionPasswordNeededError
