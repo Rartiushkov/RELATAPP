@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Analytics</title>
+</head>
+<body>
+    <h1>Chat Analytics</h1>
+    <p>User messages: {{ stats.get('user', 0) }}</p>
+    <p>Assistant messages: {{ stats.get('assistant', 0) }}</p>
+    <a href="{{ url_for('chat') }}">Back to chat</a>
+</body>
+</html>
