@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import sqlite3
-import hmac
-import hashlib
 import os
 import requests
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_me")
 
 DATABASE = "chat.db"
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 
@@ -20,39 +17,50 @@ def get_db():
     return conn
 
 
-def verify_telegram_auth(data: dict) -> bool:
-    """Validate Telegram login widget data."""
-    if not TELEGRAM_BOT_TOKEN:
-        return False
-    auth_hash = data.pop("hash", None)
-    if not auth_hash:
-        return False
-    data_check = [f"{k}={v}" for k, v in sorted(data.items())]
-    data_string = "\n".join(data_check)
-    secret_key = hashlib.sha256(TELEGRAM_BOT_TOKEN.encode()).digest()
-    h = hmac.new(secret_key, data_string.encode(), hashlib.sha256).hexdigest()
-    return h == auth_hash
-
-
 @app.route("/")
 def index():
     if "user" in session:
         return redirect(url_for("chat"))
-    return render_template("index.html", bot_username=TELEGRAM_BOT_USERNAME)
+    return render_template("login.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["POST"])
 def login():
-    data = request.args.to_dict()
-    if verify_telegram_auth(data):
-        session["user"] = {
-            "id": data.get("id"),
-            "username": data.get("username"),
-            "first_name": data.get("first_name"),
-            "last_name": data.get("last_name"),
-        }
+    username = request.form["username"]
+    password = request.form["password"]
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)"
+    )
+    cur.execute("SELECT id, password FROM users WHERE username=?", (username,))
+    row = cur.fetchone()
+    if row and check_password_hash(row["password"], password):
+        session["user"] = {"id": row["id"], "username": username}
         return redirect(url_for("chat"))
-    return "Unauthorized", 401
+    return "Invalid credentials", 401
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)"
+        )
+        try:
+            cur.execute(
+                "INSERT INTO users(username, password) VALUES(?, ?)",
+                (username, generate_password_hash(password)),
+            )
+            conn.commit()
+        except sqlite3.IntegrityError:
+            return "User already exists", 400
+        return redirect(url_for("index"))
+    return render_template("register.html")
 
 
 @app.route("/chat")
