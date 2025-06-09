@@ -2,7 +2,6 @@ const form = document.getElementById('chat-form');
 const box = document.getElementById('chat-box');
 const autoBtn = document.getElementById('auto-btn');
 
-
 const sendUrl = typeof TELEGRAM !== 'undefined' ? `/send/${CHAT_ID}` : '/send';
 const autoUrl = typeof TELEGRAM !== 'undefined' ? `/auto_reply/${CHAT_ID}` : '/auto_reply';
 

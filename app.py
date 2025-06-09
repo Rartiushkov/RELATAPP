@@ -86,7 +86,10 @@ def index():
         if session.get("telegram"):
             return redirect(url_for("dialogs"))
         return redirect(url_for("chat"))
-    return render_template("login.html")
+
+    telegram_enabled = bool(API_ID and API_HASH)
+    return render_template("login.html", telegram_enabled=telegram_enabled)
+
 
 
 @app.route("/telegram_login", methods=["GET", "POST"])

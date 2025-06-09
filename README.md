@@ -6,7 +6,12 @@ This project is a minimal example of a web application that allows users to chat
 
 ## Features
 
+
+
+## Features
+
 - Register and login with a username and password
+
 
 - Optional login with your Telegram account using SMS code
 - Browse your Telegram dialogs (chats only, no groups)
@@ -19,7 +24,8 @@ This project is a minimal example of a web application that allows users to chat
 
 
 1. Get an OpenAI API key.
-2. Create a `.env` file with the following contents:
+2. Create a `.env` file with the following contents. The Telegram values are
+   required if you want to log in via Telegram:
 
 ```
 FLASK_SECRET=change_me
@@ -29,8 +35,11 @@ TG_API_ID=<your api_id>
 TG_API_HASH=<your api_hash>
 ```
 
-3. Install dependencies:
 
+If you omit `TG_API_ID` or `TG_API_HASH`, the "Login with Telegram" option will
+not be shown.
+
+3. Install dependencies:
 
 
 ```bash
