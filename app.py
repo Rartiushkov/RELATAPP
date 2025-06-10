@@ -27,6 +27,8 @@ telegram_client = None
 
 telegram_loop = None
 
+
+
 def init_db():
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
@@ -392,7 +394,6 @@ def logout():
     return redirect(url_for("index"))
 
 
-if __name__ == "__main__":
 
     init_db()
 
