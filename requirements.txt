@@ -1,7 +1,6 @@
 Flask
 requests
 python-dotenv
-
 telethon
 Flask-WTF
 
