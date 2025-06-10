@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
     <h1>Welcome, {{ user.username }}</h1>
+
     <a href="{{ url_for('analytics') }}">Analytics</a> |
     <a href="{{ url_for('logout') }}">Logout</a>
     <div id="chat-box">
@@ -15,14 +17,17 @@
         {% endfor %}
     </div>
     <form id="chat-form">
+
         {{ csrf_token() }}
+
         <input type="text" id="message" name="message" autocomplete="off" required>
         <button type="submit">Send</button>
         <button type="button" id="auto-btn">Auto reply</button>
-    </form>
+
     {% if chat_id is defined %}
     <script>const CHAT_ID={{ chat_id }};const TELEGRAM=true;</script>
     {% endif %}
+
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>
