@@ -181,7 +181,6 @@ def register():
     return render_template("register.html")
 
 
-
 @app.route("/chat")
 def chat():
     if "user" not in session:
@@ -394,7 +393,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-
+if __name__ == "__main__":
     init_db()
 
     app.run(debug=True)
