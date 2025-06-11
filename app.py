@@ -358,6 +358,7 @@ def auto_reply_telegram(chat_id):
         else:
             reply = f"OpenAI API error: {resp.status_code}"
 
+
     else:
         reply = "No OpenAI API key configured."
     client = get_telegram_client()
