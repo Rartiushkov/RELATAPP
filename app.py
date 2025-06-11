@@ -101,7 +101,29 @@ def sync_messages_from_telegram(chat_id, limit=20):
 
 @app.route("/")
 def index():
-    if "user" in session:
+        try:
+            client.sign_in(phone, code)
+        except SessionPasswordNeededError:
+            session["tg_code"] = code
+            return render_template("telegram_password.html")
+    me = client.get_me()
+    session["user"] = {"id": me.id, "username": me.username or me.first_name}
+    session["telegram"] = True
+    return redirect(url_for("dialogs"))
+
+
+@app.route("/telegram_password", methods=["POST"])
+def telegram_password():
+    client = get_telegram_client()
+    if client is None:
+        return "Telegram login not configured", 500
+    phone = session.get("tg_phone")
+    code = session.get("tg_code")
+    password = request.form.get("password")
+    client.connect()
+    if not client.is_user_authorized():
+        client.sign_in(phone=phone, code=code, password=password)
+    session.pop("tg_code", None)
         if session.get("telegram"):
             return redirect(url_for("dialogs"))
         return redirect(url_for("chat"))

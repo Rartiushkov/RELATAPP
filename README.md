@@ -1,6 +1,7 @@
 
-# ChatGPT Web App
+- Optional login with your Telegram account using SMS code (2FA passwords are supported)
 
+If your Telegram account has a password, the app will ask for it after you enter the code.
 This project is a minimal example of a web application that allows users to chat with Telegram contacts or with a local account. Chats are stored in SQLite and the app connects to the OpenAI ChatGPT API to generate replies.
 
 ## Features
