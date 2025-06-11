@@ -139,10 +139,34 @@ def telegram_code():
     code = request.form["code"]
     client.connect()
     if not client.is_user_authorized():
-        client.sign_in(phone, code)
+
+        try:
+            client.sign_in(phone, code)
+        except SessionPasswordNeededError:
+            session["tg_code"] = code
+            return render_template("telegram_password.html")
     me = client.get_me()
     session["user"] = {"id": me.id, "username": me.username or me.first_name}
     session["telegram"] = True
+    return redirect(url_for("dialogs"))
+
+
+@app.route("/telegram_password", methods=["POST"])
+def telegram_password():
+    client = get_telegram_client()
+    if client is None:
+        return "Telegram login not configured", 500
+    phone = session.get("tg_phone")
+    code = session.get("tg_code")
+    password = request.form.get("password")
+    client.connect()
+    if not client.is_user_authorized():
+        client.sign_in(phone=phone, code=code, password=password)
+    me = client.get_me()
+    session["user"] = {"id": me.id, "username": me.username or me.first_name}
+    session["telegram"] = True
+    session.pop("tg_code", None)
+
     return redirect(url_for("dialogs"))
 
 
@@ -357,7 +381,6 @@ def auto_reply_telegram(chat_id):
             reply = data["choices"][0]["message"]["content"]
         else:
             reply = f"OpenAI API error: {resp.status_code}"
-
 
     else:
         reply = "No OpenAI API key configured."

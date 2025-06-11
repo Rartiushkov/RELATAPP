@@ -7,7 +7,8 @@ This project is a minimal example of a web application that allows users to chat
 
 - Register and login with a username and password
 
-- Optional login with your Telegram account using SMS code
+- Optional login with your Telegram account using SMS code (2FA passwords are supported)
+
 - Browse your Telegram dialogs (chats only, no groups)
 - Messages stored locally in `chat.db`
 - ChatGPT integration for advice or auto responses
@@ -33,6 +34,7 @@ it starts.
 
 If you omit `TG_API_ID` or `TG_API_HASH`, the "Login with Telegram" option will
 not be shown.
+If your Telegram account has a password, the app will ask for it after you enter the code.
 
 3. Install dependencies:
 
@@ -50,7 +52,6 @@ python app.py
 ```
 
 Then open `http://localhost:5000` in your browser.
-
 
 After Telegram login you will see a list of your private chats. Select one to load messages and chat with the Auto reply button.
 
