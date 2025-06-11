@@ -3,5 +3,7 @@ body { font-family: sans-serif; margin: 20px; }
 .msg { margin: 5px 0; padding: 5px; }
 .msg.user { text-align: right; background-color: #e0f7fa; }
 .msg.assistant { text-align: left; background-color: #eee; }
+
 .msg.peer { text-align: left; background-color: #f9f9f9; }
+
 #auto-btn { margin-left: 5px; }
